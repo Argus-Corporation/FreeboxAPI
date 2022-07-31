@@ -3,11 +3,11 @@ package net.argus.api.freebox;
 public class FreeboxSession {
 	
 	private String sessionToken;
-	private Permission perm;
+	private SessionPermission perm;
 	
 	private boolean close;
 	
-	public FreeboxSession(String sesstionToken, Permission perm) {
+	public FreeboxSession(String sesstionToken, SessionPermission perm) {
 		this.sessionToken = sesstionToken;
 		this.perm = perm;
 	}
@@ -16,7 +16,7 @@ public class FreeboxSession {
 		return sessionToken;
 	}
 
-	public Permission getPerm() {
+	public SessionPermission getPerm() {
 		return perm;
 	}
 	

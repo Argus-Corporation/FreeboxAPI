@@ -74,7 +74,7 @@ public class Freebox {
 		if(!ses.isSuccess())
 			return null;
 		
-		return new FreeboxSession(ses.getResult().getString("session_token"), Permission.getPermissions(ses));
+		return new FreeboxSession(ses.getResult().getString("session_token"), SessionPermission.getPermissions(ses));
 	}
 	
 	public boolean closeSession(FreeboxSession session) throws IOException {

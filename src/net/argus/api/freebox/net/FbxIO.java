@@ -30,11 +30,14 @@ public class FbxIO {
 	
 	public static FbxRequestReturn sendPOST(String path, FbxPackage value, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
+		System.out.println(url);
 		return sendPOST(url, session, value);
 	}
 	
 	public static FbxRequestReturn sendGET(String path, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
+		System.out.println(url);
+
 		return sendGET(url, session);
 	}
 	
@@ -47,7 +50,8 @@ public class FbxIO {
 			url = new URL("https://" + fbxProperties.getApiDomain() + ":" + fbxProperties.getHttpsPort() + fbxProperties.getApiBaseUrl() + "v" + version + (!path.startsWith("/")?"/":"") + path);
 		else
 			url = new URL("http://mafreebox.freebox.fr" + fbxProperties.getApiBaseUrl() + "v" + version + (!path.startsWith("/")?"/":"") + path);
-		return url;
+		
+		return new URL(StringManager.remplace(url.toString(), " ", "%20"));
 	}
 	
 	public static FbxRequestReturn sendGET(URL url, FreeboxSession session) throws IOException {

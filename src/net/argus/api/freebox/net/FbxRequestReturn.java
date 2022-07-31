@@ -1,7 +1,9 @@
 package net.argus.api.freebox.net;
 
+import net.argus.cjson.Array;
 import net.argus.cjson.CJSON;
 import net.argus.cjson.CJSONParser;
+import net.argus.cjson.value.CJSONArray;
 
 public class FbxRequestReturn {
 	
@@ -28,7 +30,17 @@ public class FbxRequestReturn {
 	public CJSON getResult() {
 		if(!success)
 			return null;
+		if(respons.getValue("result") instanceof CJSONArray)
+			return null;
 		return CJSONParser.getCJSON(respons.getObject("result").toString());
+	}
+	
+	public Array getResultArray() {
+		if(!success)
+			return null;
+		if(!(respons.getValue("result") instanceof CJSONArray))
+			return null;
+		return respons.getArray("result");
 	}
 	
 	public boolean isSuccess() {return success;}

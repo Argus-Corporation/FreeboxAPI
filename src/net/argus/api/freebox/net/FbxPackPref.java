@@ -13,7 +13,12 @@ public class FbxPackPref {
 	}
 	
 	public static FbxPackage getSessionPackage(String appId, String password) {
-		return FbxPackageBuilder.getPack(new FbxPackEntry("app_id", appId), new FbxPackEntry("password",password));
+		return FbxPackageBuilder.getPack(new FbxPackEntry("app_id", appId), new FbxPackEntry("password", password));
+	}
+
+	public static FbxPackage getAirMediaPlayPackage() {
+		return FbxPackageBuilder.getPack(new FbxPackEntry("action", "start"), new FbxPackEntry("media_type", "audio"),
+				new FbxPackEntry("media", "https://www.kozco.com/tech/LRMonoPhase4.mp3"), new FbxPackEntry("password", "1111"));
 	}
 
 }

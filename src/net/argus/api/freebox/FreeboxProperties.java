@@ -12,7 +12,7 @@ public class FreeboxProperties {
 	private String boxModel;
 	private String apiDomain;
 	private String uid;
-	private String apiVersion;
+	private String apiVersion = "5.0";
 	private String deviceType;
 	
 	public FreeboxProperties(FbxRequestReturn apiVersionReturn) {
@@ -24,7 +24,7 @@ public class FreeboxProperties {
 		boxModel = apiVersionReturn.getRespons().getString("box_model");
 		apiDomain = apiVersionReturn.getRespons().getString("api_domain");
 		uid = apiVersionReturn.getRespons().getString("uid");
-		apiVersion = apiVersionReturn.getRespons().getString("api_version");
+		//apiVersion = apiVersionReturn.getRespons().getString("api_version");
 		deviceType = apiVersionReturn.getRespons().getString("device_type");
 	}
 	
