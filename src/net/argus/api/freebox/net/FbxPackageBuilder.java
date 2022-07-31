@@ -1,6 +1,5 @@
 package net.argus.api.freebox.net;
 
-import net.argus.api.freebox.FbxPackage;
 import net.argus.cjson.CJSONItem;
 import net.argus.cjson.value.CJSONBoolean;
 import net.argus.cjson.value.CJSONInteger;

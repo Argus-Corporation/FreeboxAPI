@@ -1,19 +1,23 @@
 package net.argus.api.freebox;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 
-import net.argus.api.freebox.net.FbxRequestReturn;
+import net.argus.instance.Instance;
 
 public class Main {
-
-	public static void main(String[] args) throws IOException {
-		Freebox freebox = Freebox.getLocalFreebox();
-		//System.out.println(FbxIO.sendPOST("/login/authorize/", null, FbxPackPref.getAuthorizationPackage("argus_freebox", "FreeboxAPI", "0.0"), freebox.getProperties()).getResult());
-		FbxRequestReturn autRes = new FbxRequestReturn("{\"success\": true, \"result\": {\"app_token\": \"imkrfZoNRKEzMCIHjn+s3e4iezkqhnHu2RT3x8a3/EAKd+ppUXkBLGQ8kg2uT+jn\", \"track_id\": 0}}");
-		
-		FbxAuthorizationStatus.waitAuthorization(freebox.getProperties(), autRes.getResult().getInt("track_id"));
-		
 	
+	public static final Instance MAIN = new Instance("fbx-main");
+	public static final Instance STATUS = new Instance("fbx-status");
+
+	public static void main(String[] args) throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException {
+		Freebox freebox = Freebox.getLocalFreebox();
+		FreeboxApp app = freebox.createNewApp("argus_freebox", "FreeboxAPI", "0.0");
+		//FreeboxSession ses = freebox.openSession(app);
+		//freebox.closeSession(ses);
+
 	}
 
 }

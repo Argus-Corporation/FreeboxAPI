@@ -11,8 +11,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -21,8 +19,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import net.argus.api.freebox.FbxPackage;
 import net.argus.api.freebox.FreeboxProperties;
+import net.argus.api.freebox.FreeboxSession;
 import net.argus.util.StringManager;
 
 
@@ -30,14 +28,14 @@ public class FbxIO {
 	
 	private static boolean init = false;
 	
-	public static FbxRequestReturn sendPOST(String path, Map<String, String> properties, FbxPackage value, FreeboxProperties fbxProperties) throws IOException {
+	public static FbxRequestReturn sendPOST(String path, FbxPackage value, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
-		return sendPOST(url, properties, value);
+		return sendPOST(url, session, value);
 	}
 	
-	public static FbxRequestReturn sendGET(String path, Map<String, String> properties, FreeboxProperties fbxProperties) throws IOException {
+	public static FbxRequestReturn sendGET(String path, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
-		return sendGET(url, properties);
+		return sendGET(url, session);
 	}
 	
 	public static URL getURL(String path, FreeboxProperties fbxProperties) throws MalformedURLException {
@@ -52,31 +50,34 @@ public class FbxIO {
 		return url;
 	}
 	
-	public static FbxRequestReturn sendGET(URL url, Map<String, String> properties) throws IOException {
+	public static FbxRequestReturn sendGET(URL url, FreeboxSession session) throws IOException {
 		HttpURLConnection  con = openConnection(url);
 		
 		con.setRequestMethod("GET");
-		if(properties != null)
-			for(Entry<String, String> entry : properties.entrySet())
-				con.addRequestProperty(entry.getKey(), entry.getValue());
+		if(session != null && !session.isClose())
+			con.addRequestProperty("X-Fbx-App-Auth", session.getSessionToken());
 			
 		return new FbxRequestReturn(convertStreamToString(con.getInputStream()));
 	}
 	
-	public static FbxRequestReturn sendPOST(URL url, Map<String, String> properties, FbxPackage value) throws IOException {
+	public static FbxRequestReturn sendPOST(URL url, FreeboxSession session, FbxPackage value) throws IOException {
 		HttpURLConnection  con = openConnection(url);
 		
 		con.setRequestMethod("POST");
+		if(session != null && !session.isClose())
+			con.addRequestProperty("X-Fbx-App-Auth", session.getSessionToken());
+		
 		con.setDoOutput(true);
 
-		byte[] out = value.toString().getBytes(StandardCharsets.UTF_8);
-		int length = out.length;
-
-		con.setFixedLengthStreamingMode(length);
-		con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-		con.connect();
-		try(OutputStream os = con.getOutputStream()) {
-		    os.write(out);
+		if(value != null) {
+			byte[] out = value.toString().getBytes(StandardCharsets.UTF_8);
+			int length = out.length;
+			con.setFixedLengthStreamingMode(length);
+			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			con.connect();
+			try(OutputStream os = con.getOutputStream()) {
+			    os.write(out);
+			}
 		}
 		
 		return new FbxRequestReturn(convertStreamToString(con.getInputStream()));
