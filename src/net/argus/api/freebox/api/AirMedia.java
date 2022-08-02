@@ -13,20 +13,17 @@ import net.argus.api.freebox.net.FbxPackPref;
 import net.argus.api.freebox.net.FbxRequestReturn;
 import net.argus.cjson.Array;
 
+@Deprecated
 public class AirMedia extends FbxAPI {
 	
 	private List<AirMediaReceiver> receivers = new ArrayList<AirMediaReceiver>();
-	private FreeboxProperties properties;
-	private FreeboxSession session;
 	
 	AirMedia(FreeboxProperties properties, FreeboxSession session) throws IOException {
-		this.properties = properties;
-		this.session = session;
-		
-		init(properties, session);
+		super(properties, session);
 	}
 	
-	private void init(FreeboxProperties properties, FreeboxSession session) throws IOException {
+	@Override
+	protected void init() throws IOException {
 		FbxRequestReturn ret = FbxIO.sendGET("/airmedia/receivers/", session, properties);
 		if(!ret.isSuccess())
 			return;

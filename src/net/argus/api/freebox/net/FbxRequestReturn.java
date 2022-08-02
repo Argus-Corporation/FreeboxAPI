@@ -4,6 +4,8 @@ import net.argus.cjson.Array;
 import net.argus.cjson.CJSON;
 import net.argus.cjson.CJSONParser;
 import net.argus.cjson.value.CJSONArray;
+import net.argus.util.debug.Debug;
+import net.argus.util.debug.Info;
 
 public class FbxRequestReturn {
 	
@@ -12,13 +14,18 @@ public class FbxRequestReturn {
 	private String errorCode;
 	private String msg;
 	
-	public FbxRequestReturn(String respons) {
+	private int httpCode;
+	
+	public FbxRequestReturn(String respons, int httpCode) {
 		this.respons = CJSONParser.getCJSON(respons);
+		this.httpCode = httpCode;
+		
 		if(this.respons.getValue("success") != null) {
 			this.success = this.respons.getBoolean("success");
 			if(!this.success) {
 				this.errorCode = this.respons.getString("error_code");
 				this.msg = this.respons.getString("msg");
+				Debug.log("Http code " + httpCode + " with message \"" + msg + "\" !", Info.ERROR);
 			}
 		}
 	}
@@ -46,6 +53,7 @@ public class FbxRequestReturn {
 	public boolean isSuccess() {return success;}
 	public String getErrorCode() {return errorCode;}
 	public String getMessage() {return msg;}
+	public int getHttpCode() {return httpCode;}
 	
 	@Override
 	public String toString() {

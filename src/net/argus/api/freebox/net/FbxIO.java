@@ -21,6 +21,7 @@ import javax.net.ssl.X509TrustManager;
 
 import net.argus.api.freebox.FreeboxProperties;
 import net.argus.api.freebox.FreeboxSession;
+import net.argus.http.HTTPMethod;
 import net.argus.util.StringManager;
 
 
@@ -30,13 +31,12 @@ public class FbxIO {
 	
 	public static FbxRequestReturn sendPOST(String path, FbxPackage value, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
-		System.out.println(url);
+		
 		return sendPOST(url, session, value);
 	}
 	
 	public static FbxRequestReturn sendGET(String path, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
-		System.out.println(url);
 
 		return sendGET(url, session);
 	}
@@ -55,22 +55,13 @@ public class FbxIO {
 	}
 	
 	public static FbxRequestReturn sendGET(URL url, FreeboxSession session) throws IOException {
-		HttpURLConnection  con = openConnection(url);
-		
-		con.setRequestMethod("GET");
-		if(session != null && !session.isClose())
-			con.addRequestProperty("X-Fbx-App-Auth", session.getSessionToken());
+		HttpURLConnection  con = getDefaultConnection(url, session, HTTPMethod.GET);
 			
-		return new FbxRequestReturn(convertStreamToString(con.getInputStream()));
+		return new FbxRequestReturn(convertStreamToString(con), con.getResponseCode());
 	}
 	
 	public static FbxRequestReturn sendPOST(URL url, FreeboxSession session, FbxPackage value) throws IOException {
-		HttpURLConnection  con = openConnection(url);
-		
-		con.setRequestMethod("POST");
-		if(session != null && !session.isClose())
-			con.addRequestProperty("X-Fbx-App-Auth", session.getSessionToken());
-		
+		HttpURLConnection con = getDefaultConnection(url, session, HTTPMethod.POST);
 		con.setDoOutput(true);
 
 		if(value != null) {
@@ -83,11 +74,28 @@ public class FbxIO {
 			    os.write(out);
 			}
 		}
-		
-		return new FbxRequestReturn(convertStreamToString(con.getInputStream()));
+		String str = convertStreamToString(con);
+
+		return new FbxRequestReturn(str, con.getResponseCode());
 	}
 	
-	private static String convertStreamToString(InputStream is) {
+	private static HttpURLConnection getDefaultConnection(URL url, FreeboxSession session, HTTPMethod method) throws IOException {
+		HttpURLConnection  con = openConnection(url);
+		
+		con.setRequestMethod(method.toString());
+		if(session != null && !session.isClose())
+			con.addRequestProperty("X-Fbx-App-Auth", session.getSessionToken());
+		
+		return con;
+	}
+	
+	private static String convertStreamToString(HttpURLConnection con) throws IOException {
+		InputStream is;
+		if(con.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST)
+		    is = con.getInputStream();
+		else
+		    is = con.getErrorStream();
+		
 	    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 	    StringBuilder sb = new StringBuilder();
 

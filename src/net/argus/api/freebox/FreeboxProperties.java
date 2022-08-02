@@ -4,6 +4,8 @@ import net.argus.api.freebox.net.FbxRequestReturn;
 
 public class FreeboxProperties {
 	
+	private static boolean allowHttps = true;
+	
 	private String boxModelName;
 	private String apiBaseUrl;
 	private int httpsPort;
@@ -12,7 +14,7 @@ public class FreeboxProperties {
 	private String boxModel;
 	private String apiDomain;
 	private String uid;
-	private String apiVersion = "5.0";
+	private String apiVersion;
 	private String deviceType;
 	
 	public FreeboxProperties(FbxRequestReturn apiVersionReturn) {
@@ -24,7 +26,7 @@ public class FreeboxProperties {
 		boxModel = apiVersionReturn.getRespons().getString("box_model");
 		apiDomain = apiVersionReturn.getRespons().getString("api_domain");
 		uid = apiVersionReturn.getRespons().getString("uid");
-		//apiVersion = apiVersionReturn.getRespons().getString("api_version");
+		apiVersion = apiVersionReturn.getRespons().getString("api_version");
 		deviceType = apiVersionReturn.getRespons().getString("device_type");
 	}
 	
@@ -45,7 +47,7 @@ public class FreeboxProperties {
 	}
 
 	public boolean isHttpsAvailable() {
-		return httpsAvailable;
+		return allowHttps?httpsAvailable:false;
 	}
 
 	public String getBoxModel() {
@@ -67,5 +69,8 @@ public class FreeboxProperties {
 	public String getDeviceType() {
 		return deviceType;
 	}
+	
+	public static void setAllowHttps(boolean allowHttps) {FreeboxProperties.allowHttps = allowHttps;}
+	public static boolean isAllowHttps() {return allowHttps;}
 
 }

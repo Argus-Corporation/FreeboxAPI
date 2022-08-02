@@ -1,6 +1,7 @@
 package net.argus.api.freebox;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -31,14 +32,13 @@ public class Freebox {
 	
 	@SuppressWarnings("incomplete-switch")
 	public FreeboxApp createNewApp(String appId, String appName, String appVersion) throws IOException {
-		//FbxRequestReturn autRes = FbxIO.sendPOST("/login/authorize/", FbxPackPref.getAuthorizationPackage(appId, appName, appVersion), null, properties);
-		FbxRequestReturn autRes = new FbxRequestReturn("{\"success\": true, \"result\": {\"app_token\": \"xY9/H/hgx/Z29oc64rcL2Xvr/uaO+gaiPfhTNiubwDBtFSGkvmO5HW5NdfeuRmIM\", \"track_id\": 5}}");
+		FbxRequestReturn autRes = FbxIO.sendPOST("/login/authorize/", FbxPackPref.getAuthorizationPackage(appId, appName, appVersion), null, properties);
 
 		if(!autRes.isSuccess())
 			return null;
 		
 		FbxAuthorizationStatus status = new FbxAuthorizationStatus(properties, autRes.getResult().getInt("track_id"));
-		FbxRequestReturn statusRet = status.startFinding(false);
+		FbxRequestReturn statusRet = status.startFinding();
 		
 		if(statusRet == null || !statusRet.isSuccess()) 
 			return null;
@@ -54,7 +54,7 @@ public class Freebox {
 		}
 		
 		
-		return new FreeboxApp(appId, autRes.getResult().getString("app_token"), statusRet.getResult().getString("challenge"), statusRet.getResult().getString("password_salt"));
+		return new FreeboxApp(appId, autRes.getResult().getString("app_token"));
 	}
 	
 	public FreeboxSession openSession(FreeboxApp app) throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException {
