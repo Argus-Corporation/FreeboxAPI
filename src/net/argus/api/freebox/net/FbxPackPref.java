@@ -22,7 +22,6 @@ public class FbxPackPref {
 		return FbxPackageBuilder.getPack(new FbxPackEntry("app_id", appId), new FbxPackEntry("password", password));
 	}
 
-	@Deprecated
 	public static FbxPackage getAirMediaPlayPackage() {
 		return FbxPackageBuilder.getPack(new FbxPackEntry("action", "start"), new FbxPackEntry("media_type", "audio"),
 				new FbxPackEntry("media", "https://www.kozco.com/tech/LRMonoPhase4.mp3"), new FbxPackEntry("password", "1111"));
@@ -51,5 +50,14 @@ public class FbxPackPref {
 
 		return FbxPackageBuilder.getPackArray((FbxPackEntry[]) entrys.toArray(new FbxPackEntry[] {}));
 	}
+	
+	public static FbxPackage getUpdateCall(boolean new0) {
+		return FbxPackageBuilder.getPack(new FbxPackEntry("new", new0));
+	}
+	
+	public static FbxPackage getUpdateVoiceMail(boolean read) {
+		return FbxPackageBuilder.getPack(new FbxPackEntry("read", read));
+	}
+
 
 }

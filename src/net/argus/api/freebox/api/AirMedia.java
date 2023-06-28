@@ -13,10 +13,9 @@ import net.argus.api.freebox.net.FbxPackPref;
 import net.argus.api.freebox.net.FbxRequestReturn;
 import net.argus.cjson.Array;
 
-@Deprecated
 public class AirMedia extends FbxAPI {
 	
-	private List<AirMediaReceiver> receivers = new ArrayList<AirMediaReceiver>();
+	private List<AirMediaReceiver> receivers;
 	
 	AirMedia(FreeboxProperties properties, FreeboxSession session) throws IOException {
 		super(properties, session);
@@ -24,16 +23,18 @@ public class AirMedia extends FbxAPI {
 	
 	@Override
 	protected void init() throws IOException {
+		receivers = new ArrayList<AirMediaReceiver>();
+		
 		FbxRequestReturn ret = FbxIO.sendGET("/airmedia/receivers/", session, properties);
 		if(!ret.isSuccess())
 			return;
 		
 		Array arr = ret.getResultArray();
-		for(int i = 0; i < ret.getResultArray().length(); i++)
+		for(int i = 0; i < arr.length(); i++)
 			receivers.add(new AirMediaReceiver(arr.get(i).getString("name"), AirMediaCapabilitie.getCapabilitie(arr.get(i).getObject("capabilities")), arr.get(i).getBoolean("password_protected")));
-
 	}
 	
+	@Deprecated
 	public void play() throws IOException {
 		FbxRequestReturn ret = FbxIO.sendPOST("/airmedia/receivers/" + receivers.get(0).getName() + "/", FbxPackPref.getAirMediaPlayPackage(), session, properties);
 		System.out.println(ret);

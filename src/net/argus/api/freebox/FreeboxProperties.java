@@ -24,7 +24,8 @@ public class FreeboxProperties {
 		deviceName = apiVersionReturn.getRespons().getString("device_name");
 		httpsAvailable = apiVersionReturn.getRespons().getBoolean("https_available");
 		boxModel = apiVersionReturn.getRespons().getString("box_model");
-		apiDomain = apiVersionReturn.getRespons().getString("api_domain");
+		if(apiVersionReturn.getRespons().getValue("api_domain") != null)
+			apiDomain = apiVersionReturn.getRespons().getString("api_domain");
 		uid = apiVersionReturn.getRespons().getString("uid");
 		apiVersion = apiVersionReturn.getRespons().getString("api_version");
 		deviceType = apiVersionReturn.getRespons().getString("device_type");

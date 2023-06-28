@@ -25,7 +25,7 @@ public class AirMediaCapabilitie extends Permission<AirMediaCapabilities, Boolea
 			
 			map.put(perm, Boolean.valueOf(item.getValue().toString()));
 		}
-		
+
 		return new AirMediaCapabilitie(map);
 	}
 

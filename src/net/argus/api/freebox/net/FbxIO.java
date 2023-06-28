@@ -35,10 +35,22 @@ public class FbxIO {
 		return sendPOST(url, session, value);
 	}
 	
+	public static FbxRequestReturn sendPUT(String path, FbxPackage value, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
+		URL url = getURL(path, fbxProperties);
+		
+		return sendPUT(url, session, value);
+	}
+	
 	public static FbxRequestReturn sendGET(String path, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
 		URL url = getURL(path, fbxProperties);
 
 		return sendGET(url, session);
+	}
+	
+	public static FbxRequestReturn sendDELETE(String path, FreeboxSession session, FreeboxProperties fbxProperties) throws IOException {
+		URL url = getURL(path, fbxProperties);
+
+		return sendDELETE(url, session);
 	}
 	
 	public static URL getURL(String path, FreeboxProperties fbxProperties) throws MalformedURLException {
@@ -46,8 +58,10 @@ public class FbxIO {
 		version = version.substring(0, version.indexOf('.'));
 		URL url = null;
 
-		if(fbxProperties.isHttpsAvailable())
-			url = new URL("https://" + fbxProperties.getApiDomain() + ":" + fbxProperties.getHttpsPort() + fbxProperties.getApiBaseUrl() + "v" + version + (!path.startsWith("/")?"/":"") + path);
+		if(fbxProperties.isHttpsAvailable() && fbxProperties.getApiDomain() != null)
+			url = new URL("http://mafreebox.freebox.fr" + fbxProperties.getApiBaseUrl() + "v" + version + (!path.startsWith("/")?"/":"") + path);
+
+			//url = new URL("https://" + fbxProperties.getApiDomain() + ":" + fbxProperties.getHttpsPort() + fbxProperties.getApiBaseUrl() + "v" + version + (!path.startsWith("/")?"/":"") + path);
 		else
 			url = new URL("http://mafreebox.freebox.fr" + fbxProperties.getApiBaseUrl() + "v" + version + (!path.startsWith("/")?"/":"") + path);
 		
@@ -57,7 +71,13 @@ public class FbxIO {
 	public static FbxRequestReturn sendGET(URL url, FreeboxSession session) throws IOException {
 		HttpURLConnection  con = getDefaultConnection(url, session, HTTPMethod.GET);
 			
-		return new FbxRequestReturn(convertStreamToString(con), con.getResponseCode());
+		return new FbxRequestReturn(convertStreamToString(con), con.getResponseCode(), con.getHeaderFields());
+	}
+	
+	public static FbxRequestReturn sendDELETE(URL url, FreeboxSession session) throws IOException {
+		HttpURLConnection  con = getDefaultConnection(url, session, HTTPMethod.DELETE);
+			
+		return new FbxRequestReturn(convertStreamToString(con), con.getResponseCode(), con.getHeaderFields());
 	}
 	
 	public static FbxRequestReturn sendPOST(URL url, FreeboxSession session, FbxPackage value) throws IOException {
@@ -76,7 +96,26 @@ public class FbxIO {
 		}
 		String str = convertStreamToString(con);
 
-		return new FbxRequestReturn(str, con.getResponseCode());
+		return new FbxRequestReturn(str, con.getResponseCode(), con.getHeaderFields());
+	}
+	
+	public static FbxRequestReturn sendPUT(URL url, FreeboxSession session, FbxPackage value) throws IOException {
+		HttpURLConnection con = getDefaultConnection(url, session, HTTPMethod.PUT);
+		con.setDoOutput(true);
+
+		if(value != null) {
+			byte[] out = value.toString().getBytes(StandardCharsets.UTF_8);
+			int length = out.length;
+			con.setFixedLengthStreamingMode(length);
+			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			con.connect();
+			try(OutputStream os = con.getOutputStream()) {
+			    os.write(out);
+			}
+		}
+		String str = convertStreamToString(con);
+
+		return new FbxRequestReturn(str, con.getResponseCode(), con.getHeaderFields());
 	}
 	
 	private static HttpURLConnection getDefaultConnection(URL url, FreeboxSession session, HTTPMethod method) throws IOException {

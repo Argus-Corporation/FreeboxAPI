@@ -7,10 +7,10 @@ import net.argus.api.freebox.FreeboxSession;
 import net.argus.util.debug.Debug;
 import net.argus.util.debug.Info;
 
-@SuppressWarnings("deprecation")
 public abstract class FbxAPI {
 	
 	private static AirMedia airMedia = null;
+	private static Call call = null;
 	private static Language language = null;
 	private static RRD rrd = null;
 	
@@ -34,6 +34,10 @@ public abstract class FbxAPI {
 		airMedia = new AirMedia(properties, session);
 	}
 	
+	public static void setCallSession(FreeboxProperties properties, FreeboxSession session) throws IOException {
+		call = new Call(properties, session);
+	}
+	
 	public static void setLanguageSession(FreeboxProperties properties, FreeboxSession session) throws IOException {
 		language = new Language(properties, session);
 	}
@@ -48,6 +52,14 @@ public abstract class FbxAPI {
 			return null;
 		}
 		return airMedia;
+	}
+	
+	public static Call getCall() {
+		if(call == null) {
+			Debug.log("Call isn't created");
+			return null;
+		}
+		return call;
 	}
 	
 	public static Language getLanguage() {
